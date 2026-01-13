@@ -33,34 +33,18 @@ body {
 }
 #consoleBtn:hover { transform: scale(1.1); background: var(--blue); }
 
-/* Веб контейнер */
+/* Веб контейнер — квадрат и масштабируется по ширине экрана */
 .web {
   position: relative;
-  width: min(92vw, 900px);
-  aspect-ratio: 1;
+  width: min(92vw, 900px);  /* максимум 900px, но подстраивается под экран */
+  aspect-ratio: 1;          /* квадрат */
 }
 
-/* SVG линии и кольца */
-svg { position:absolute; inset:0; width:100%; height:100%; }
-.radials line {
-  stroke: rgba(168,85,247,0.45);
-  stroke-width: 2.5;
-  transition: 0.3s;
-}
-.web.hovered .radials line,
-svg:hover .radials line {
-  stroke: var(--blue);
-  filter: drop-shadow(0 0 10px var(--blue));
-}
-.ring { fill:none; stroke: rgba(168,85,247,0.9); stroke-dasharray:10 12; filter: drop-shadow(0 0 10px #7c3aed);}
-.thin { stroke-width: 1.6; opacity: 0.5; }
-.thick { stroke-width: 4.5; }
-
-/* Узлы */
+/* Узлы — автоподгонка под размер контейнера */
 .node {
   position: absolute;
-  width: clamp(90px,18vw,140px);
-  height: clamp(90px,18vw,140px);
+  width: calc(14% + 10px);  /* примерно масштаб под контейнер */
+  height: calc(14% + 10px);
   border-radius: 50%;
   background: rgba(15,15,35,0.95);
   border: 2px solid var(--purple);
@@ -73,22 +57,57 @@ svg:hover .radials line {
   user-select: none;
   touch-action: none;
   transition: 0.3s;
+  font-size: calc(0.9vw + 4px); /* масштаб текста */
 }
+
+/* Центр — подстраиваемся под экран */
+.center {
+  width: calc(20% + 20px);
+  height: calc(20% + 20px);
+  font-weight: bold;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg,#3b0764,#0c4a6e);
+  z-index: 3;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: calc(1vw + 8px);
+}
+
+/* SVG — занимает весь контейнер */
+svg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+}
+
+/* Линии и кольца адаптивные */
+.radials line,
+.ring {
+  stroke-width: calc(0.25vw + 1px); /* масштаб линии */
+}
+
+.web.hovered .radials line,
+svg:hover .radials line {
+  stroke: var(--blue);
+  filter: drop-shadow(0 0 10px var(--blue));
+}
+.ring { fill:none; stroke: rgba(168,85,247,0.9); stroke-dasharray:10 12; filter: drop-shadow(0 0 10px #7c3aed);}
+.thin { stroke-width: 1.6; opacity: 0.5; }
+.thick { stroke-width: 4.5; }
+
+/* Узлы */
+
 .node:hover { transform: scale(1.12); }
 .node.done::after { content: "✖"; position: absolute; font-size: 40px; color:#ff4d4d; }
 
 /* Центр */
-.center {
-  width: clamp(120px,22vw,180px);
-  height: clamp(120px,22vw,180px);
-  font-weight: bold;
-  left:50%;
-  top:50%;
-  transform: translate(-50%,-50%);
-  background: linear-gradient(135deg,#3b0764,#0c4a6e);
-  z-index:3;
-  cursor: grab;
-}
+
 .center:active { cursor: grabbing; }
 
 /* Позиции */
