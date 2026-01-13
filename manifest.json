@@ -1,7 +1,7 @@
 {
   "name": "Spider Web Goals",
   "short_name": "SpiderWeb",
-  "start_url": "./index.html",
+  "start_url": "./spider-web-menu/index.html",
   "display": "standalone",
   "background_color": "#05050a",
   "theme_color": "#05050a",
