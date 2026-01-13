@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spider Web Goals</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Кнопка консоли -->
+<button id="consoleBtn">Console</button>
+
+<div class="web">
+
+  <svg viewBox="0 0 900 900">
+    <!-- Радиальные линии -->
+    <g class="radials">
+      <line x1="450" y1="450" x2="450" y2="60"/>
+      <line x1="450" y1="450" x2="740" y2="180"/>
+      <line x1="450" y1="450" x2="840" y2="450"/>
+      <line x1="450" y1="450" x2="720" y2="760"/>
+      <line x1="450" y1="450" x2="450" y2="840"/>
+      <line x1="450" y1="450" x2="190" y2="700"/>
+      <line x1="450" y1="450" x2="60" y2="450"/>
+      <line x1="450" y1="450" x2="180" y2="180"/>
+    </g>
+
+    <!-- Кольца -->
+    <circle cx="450" cy="450" r="150" class="ring thin"/>
+    <circle cx="450" cy="450" r="240" class="ring"/>
+    <circle cx="450" cy="450" r="330" class="ring thick"/>
+  </svg>
+
+  <!-- Узлы -->
+  <div class="node center" id="centerNode">ГЛАВНАЯ<br>ЦЕЛЬ</div>
+
+  <div class="node n1" data-key="Разведка">Разведка</div>
+  <div class="node n2" data-key="Тактика">Тактика</div>
+  <div class="node n3" data-key="Атака">Атака</div>
+  <div class="node n4" data-key="Защита">Защита</div>
+  <div class="node n5" data-key="Ресурсы">Ресурсы</div>
+  <div class="node n6" data-key="Союзники">Союзники</div>
+  <div class="node n7" data-key="Обучение">Обучение</div>
+  <div class="node n8" data-key="Подготовка">Подготовка</div>
+
+  <!-- Инпут консоли -->
+  <div id="consoleInputBox">
+    <input id="consoleInput" placeholder="Введите слово..." />
+    <button id="consoleOk">OK</button>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
