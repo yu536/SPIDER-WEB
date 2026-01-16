@@ -1,57 +1,377 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spider Web Goals</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>Паутина моих целей</title>
+<style>
+:root{--node:120px;--font:14px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+    background:linear-gradient(135deg,#0a0a1a 0%,#1a0a2e 50%,#16213e 100%);
+    font-family:Arial,sans-serif;touch-action:none;overflow:hidden;
+    height:100vh;color:#fff;
+}
+#canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1}
+.goal-node{
+    position:absolute;width:var(--node);height:var(--node);border-radius:50%;
+    border:2px solid rgba(138,43,226,.5);display:flex;align-items:center;justify-content:center;
+    text-align:center;font-size:var(--font);font-weight:bold;cursor:pointer;
+    transition:transform .3s,box-shadow .3s;z-index:10;user-select:none;overflow:hidden;
+    animation:pulse 2s infinite;background-size:cover;background-position:center;
+}
+.goal-node.completed{border-color:rgba(50,205,50,.8)}
+@keyframes pulse{
+    0%{box-shadow:0 0 20px rgba(138,43,226,.5)}
+    50%{box-shadow:0 0 35px rgba(138,43,226,.8)}
+    100%{box-shadow:0 0 20px rgba(138,43,226,.5)}
+}
+.goal-node span{pointer-events:none;max-width:90%;text-overflow:ellipsis;overflow:hidden;white-space:nowrap}
+.controls{
+    position:fixed;bottom:4px;left:50%;transform:translateX(-50%);
+    z-index:100;background:rgba(0,0,0,.7);padding:4px;border-radius:10px;
+    border:1px solid rgba(138,43,226,.5);display:flex;flex-wrap:wrap;gap:4px;
+    max-width:96vw;font-size:0;
+}
+.controls input, .controls button{
+    padding:6px 8px;border-radius:5px;background:rgba(138,43,226,.2);
+    border:1px solid rgba(138,43,226,.5);color:#fff;font-size:12px;
+}
+.controls button{background:rgba(138,43,226,.5);cursor:pointer}
+.controls button:hover{background:rgba(138,43,226,.8)}
+.fileLabel{
+    display:inline-block;padding:6px 8px;border-radius:5px;
+    background:rgba(138,43,226,.5);color:#fff;font-size:12px;cursor:pointer;
+}
+.particle{
+    position:absolute;width:4px;height:4px;background:rgba(138,43,226,.8);
+    border-radius:50%;pointer-events:none;animation:float 10s linear infinite;
+}
+@keyframes float{
+    0%{transform:translateY(100vh) rotate(0deg);opacity:0}
+    10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100vh) rotate(360deg);opacity:0}
+}
+#confirmDel{
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+    background:rgba(0,0,0,.95);border:1px solid #8a2be2;border-radius:10px;
+    padding:20px;text-align:center;z-index:300;display:none;
+}
+#confirmDel button{margin:8px;width:80px}
+@media(max-width:600px){
+    :root{--node:80px;--font:12px}
+}
+
+
+.goal-node.focused{
+    width: min(80vw, 420px);
+    height: auto;
+    min-height: 200px;
+    border-radius: 16px;
+    background: #0b1c3d;
+    animation: none;
+    box-shadow: 0 0 60px rgba(80,120,255,.6);
+    z-index: 500;
+    padding: 20px;
+}
+
+.goal-node.focused span{
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+</style>
 </head>
 <body>
+<canvas id="canvas"></canvas>
 
-<!-- Кнопка консоли -->
-<button id="consoleBtn">Console</button>
-
-<div class="web">
-
-  <svg viewBox="0 0 900 900">
-    <!-- Радиальные линии -->
-    <g class="radials">
-      <line x1="450" y1="450" x2="450" y2="60"/>
-      <line x1="450" y1="450" x2="740" y2="180"/>
-      <line x1="450" y1="450" x2="840" y2="450"/>
-      <line x1="450" y1="450" x2="720" y2="760"/>
-      <line x1="450" y1="450" x2="450" y2="840"/>
-      <line x1="450" y1="450" x2="190" y2="700"/>
-      <line x1="450" y1="450" x2="60" y2="450"/>
-      <line x1="450" y1="450" x2="180" y2="180"/>
-    </g>
-
-    <!-- Кольца -->
-    <circle cx="450" cy="450" r="150" class="ring thin"/>
-    <circle cx="450" cy="450" r="240" class="ring"/>
-    <circle cx="450" cy="450" r="330" class="ring thick"/>
-  </svg>
-
-  <!-- Узлы -->
-  <div class="node center" id="centerNode">ГЛАВНАЯ<br>ЦЕЛЬ</div>
-
-  <div class="node n1" data-key="Разведка">Разведка</div>
-  <div class="node n2" data-key="Тактика">Тактика</div>
-  <div class="node n3" data-key="Атака">Атака</div>
-  <div class="node n4" data-key="Защита">Защита</div>
-  <div class="node n5" data-key="Ресурсы">Ресурсы</div>
-  <div class="node n6" data-key="Союзники">Союзники</div>
-  <div class="node n7" data-key="Обучение">Обучение</div>
-  <div class="node n8" data-key="Подготовка">Подготовка</div>
-
-  <!-- Инпут консоли -->
-  <div id="consoleInputBox">
-    <input id="consoleInput" placeholder="Введите слово..." />
-    <button id="consoleOk">OK</button>
-  </div>
-
+<div class="controls">
+    <input id="goalText" placeholder="Новая цель">
+    <input id="imgInput" placeholder="Ссылка на картинку">
+    <label class="fileLabel">Выбрать файл<input id="fileInput" type="file" accept="image/*" style="display:none"></label>
+    <button id="addBtn">Добавить</button>
+    <button id="delBtn">🗑</button>
 </div>
 
-<script src="script.js"></script>
+<div id="confirmDel">
+    <div id="confirmText"></div>
+    <button onclick="confirmYes()">Удалить</button><button onclick="confirmNo()">Отмена</button>
+</div>
+
+<script>
+/* ========== 1. Canvas и большая сетка ========== */
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight;}
+resize();addEventListener('resize',resize);
+
+let webPoints=[];
+function buildBig(){
+    webPoints=[];
+    const cx=canvas.width/2,cy=canvas.height/2,rings=12,ray=16;
+    webPoints.push({x:cx,y:cy,baseX:cx,baseY:cy,layer:0});
+    for(let l=1;l<=rings;l++){
+        const r=l*(Math.min(canvas.width,canvas.height)/16);
+        for(let i=0;i<ray;i++){
+            const a=(i/ray)*Math.PI*2;
+            const x=cx+Math.cos(a)*r;
+            const y=cy+Math.sin(a)*r;
+            webPoints.push({x,y,baseX:x,baseY:y,layer:l});
+        }
+    }
+}
+buildBig();
+
+function drawWeb(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.save();
+    ctx.translate(offsetX,offsetY);
+
+    ctx.strokeStyle='rgba(138,43,226,.25)';
+    ctx.lineWidth=1;
+    const cp=webPoints[0];
+
+    webPoints.slice(1).forEach(p=>{
+        ctx.beginPath();
+        ctx.moveTo(cp.baseX,cp.baseY);
+        ctx.lineTo(p.baseX,p.baseY);
+        ctx.stroke();
+    });
+
+    for(let l=1;l<=12;l++){
+        const arr=webPoints.filter(q=>q.layer===l);
+        if(arr.length>1){
+            ctx.beginPath();
+            ctx.moveTo(arr[0].baseX,arr[0].baseY);
+            for(let i=1;i<arr.length;i++) ctx.lineTo(arr[i].baseX,arr[i].baseY);
+            ctx.closePath();
+            ctx.stroke();
+        }
+    }
+
+    ctx.fillStyle='rgba(138,43,226,.8)';
+    webPoints.forEach(p=>{
+        ctx.beginPath();
+        ctx.arc(p.baseX,p.baseY,3,0,Math.PI*2);
+        ctx.fill();
+    });
+
+    ctx.restore();
+}
+
+/* ========== 2. Цели ========== */
+let goals=[],toDel=null,focusedGoal=null;
+const STORAGE_KEY='webGoals_final_v2';
+
+function save(){
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(
+        goals.map(g=>({text:g.text,pointIdx:webPoints.indexOf(g.point),completed:g.completed,img:g.img||''}))
+    ));
+}
+
+function load(){
+    const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return;
+    try{
+        const arr=JSON.parse(raw);
+        arr.forEach(({text,pointIdx,completed,img})=>{
+            if(webPoints[pointIdx] && !goals.some(g=>g.point===webPoints[pointIdx]))
+                createGoal(text,webPoints[pointIdx],completed,img,false);
+        });
+    }catch(e){}
+}
+
+function freePts(){return webPoints.filter(p=>!goals.some(g=>g.point===p));}
+function dist(p1,p2){return Math.hypot(p1.baseX-p2.baseX,p1.baseY-p2.baseY);}
+
+function goodPoint(){
+    const free=freePts(); if(!free.length) return null;
+    const nodeSize=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--node'));
+    const r=nodeSize/2+12;
+
+    for(const p of free){
+        let ok=true;
+        for(const g of goals){
+            const gr=(g.el?.offsetWidth||nodeSize)/2;
+            if(dist(p,g.point)<r+gr){ok=false;break;}
+        }
+        if(ok) return p;
+    }
+    return null;
+}
+
+function createGoal(text,point,completed=false,img='',doSave=true){
+    const g={id:Date.now()+Math.random(),text,point,completed,img,el:null};
+    goals.push(g);
+
+    const d=document.createElement('div');
+    d.className='goal-node'+(completed?' completed':'');
+    const sp=document.createElement('span');
+    sp.textContent=text;
+    d.appendChild(sp);
+
+    if(img){
+        d.style.backgroundImage=`url(${img})`;
+        d.style.backgroundBlendMode='overlay';
+    }
+
+    d.onclick=()=>toggle(g);
+    document.body.appendChild(d);
+    g.el=d;
+
+    fitText(g);
+    if(doSave) save();
+}
+
+function fitText(g){
+    const el=g.el,txt=el.querySelector('span');
+    let size=14; el.style.fontSize=size+'px';
+    while(txt.scrollWidth>el.clientWidth-10 && size>10){
+        size--; el.style.fontSize=size+'px';
+    }
+    if(txt.scrollWidth>el.clientWidth-10){
+        txt.textContent=g.text.substring(0,18)+'…';
+        el.title=g.text;
+    }
+    const w=el.offsetWidth,h=el.offsetHeight;
+    el.style.left=(g.point.baseX+offsetX-w/2)+'px';
+    el.style.top =(g.point.baseY+offsetY-h/2)+'px';
+}
+
+/* ====== ФОКУС ====== */
+function toggle(g){
+    if(focusedGoal){
+        if(focusedGoal===g) closeFocus();
+        return;
+    }
+    openFocus(g);
+}
+
+function openFocus(g){
+    focusedGoal=g;
+    g.el.classList.add('focused');
+    g.el.style.left=(innerWidth/2-g.el.offsetWidth/2)+'px';
+    g.el.style.top =(innerHeight/2-g.el.offsetHeight/2)+'px';
+}
+
+function closeFocus(){
+    if(!focusedGoal) return;
+    focusedGoal.el.classList.remove('focused');
+    focusedGoal=null;
+    applyOff();
+}
+
+/* ========== 3. Управление ========== */
+const gt=document.getElementById('goalText'),ii=document.getElementById('imgInput'),fi=document.getElementById('fileInput');
+
+document.getElementById('addBtn').onclick=()=>{
+    const t=gt.value.trim(); if(!t) return;
+    if(goals.some(g=>g.text===t)){alert('Уже есть');return;}
+    const p=goodPoint(); if(!p){alert('Нет места');return;}
+    createGoal(t,p,false,ii.value||'');
+    gt.value=ii.value=fi.value='';
+};
+
+document.getElementById('delBtn').onclick=()=>{
+    if(!goals.length) return;
+    toDel=goals[0];
+    document.getElementById('confirmText').textContent=`Удалить «${toDel.text}»?`;
+    document.getElementById('confirmDel').style.display='block';
+};
+function confirmYes(){
+    if(toDel){toDel.el.remove();goals=goals.filter(g=>g!==toDel);save();}
+    confirmNo();
+}
+function confirmNo(){
+    document.getElementById('confirmDel').style.display='none';
+    toDel=null;
+}
+
+/* ========== 4. Движение (стрелки + мышь + тач) ========== */
+let offsetX=0,offsetY=0;
+
+function maxOff(){
+    const outer=webPoints.filter(p=>p.layer===12)[0];
+    const r=Math.hypot(
+        outer.baseX-webPoints[0].baseX,
+        outer.baseY-webPoints[0].baseY
+    );
+    return r*0.22;
+}
+
+function clampOffset(){
+    const m=maxOff();
+    offsetX=Math.max(-m,Math.min(m,offsetX));
+    offsetY=Math.max(-m,Math.min(m,offsetY));
+}
+
+function applyOff(){
+    if(focusedGoal) return;
+    goals.forEach(g=>{
+        const w=g.el.offsetWidth,h=g.el.offsetHeight;
+        g.el.style.left=(g.point.baseX+offsetX-w/2)+'px';
+        g.el.style.top =(g.point.baseY+offsetY-h/2)+'px';
+    });
+}
+
+addEventListener('keydown',e=>{
+    if(focusedGoal) return;
+    const step=30;
+    if(e.key==='ArrowUp') offsetY+=step;
+    else if(e.key==='ArrowDown') offsetY-=step;
+    else if(e.key==='ArrowLeft') offsetX+=step;
+    else if(e.key==='ArrowRight') offsetX-=step;
+    else return;
+    clampOffset(); applyOff(); drawWeb();
+});
+
+/* мышь / тач */
+let drag=false,startX,startY;
+canvas.addEventListener('mousedown',e=>{
+    if(focusedGoal) return;
+    drag=true; startX=e.clientX; startY=e.clientY;
+});
+addEventListener('mousemove',e=>{
+    if(!drag||focusedGoal) return;
+    offsetX+=e.clientX-startX;
+    offsetY+=e.clientY-startY;
+    startX=e.clientX; startY=e.clientY;
+    clampOffset(); applyOff(); drawWeb();
+});
+addEventListener('mouseup',()=>drag=false);
+
+canvas.addEventListener('touchstart',e=>{
+    if(focusedGoal) return;
+    const t=e.touches[0];
+    drag=true; startX=t.clientX; startY=t.clientY;
+});
+addEventListener('touchmove',e=>{
+    if(!drag||focusedGoal) return;
+    e.preventDefault();
+    const t=e.touches[0];
+    offsetX+=t.clientX-startX;
+    offsetY+=t.clientY-startY;
+    startX=t.clientX; startY=t.clientY;
+    clampOffset(); applyOff(); drawWeb();
+},{passive:false});
+addEventListener('touchend',()=>drag=false);
+
+/* ========== 5. Частицы (снег) ========== */
+function particle(){
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.left=Math.random()*innerWidth+'px';
+    p.style.animationDuration=(8+Math.random()*7)+'s';
+    document.body.appendChild(p);
+    p.onanimationend=()=>p.remove();
+}
+setInterval(particle,1500);
+
+/* ========== 6. Цикл и старт ========== */
+function loop(){drawWeb();requestAnimationFrame(loop);}
+loop();
+load(); applyOff(); drawWeb();
+</script>
+
 </body>
 </html>
